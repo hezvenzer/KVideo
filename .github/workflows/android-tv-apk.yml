@@ -1,3 +1,33 @@
+name: Android TV APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Optional release tag used to publish the built APK"
+        required: false
+        type: string
+      release_title:
+        description: "Optional release title"
+        required: false
+        type: string
+      kvideo_url:
+        description: "Optional default KVideo URL baked into the APK"
+        required: false
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - 'android-tv/**'
+      - '.github/workflows/android-tv-apk.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-tv-apk-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build_android_tv_apk:
     runs-on: ubuntu-latest
@@ -20,8 +50,6 @@ jobs:
         uses: android-actions/setup-android@v3
         with:
           packages: 'platforms;android-34 build-tools;34.0.0'
-          # 如果已经合法接受过许可证，可加这行避免交互式等待：
-          # log-accepted-android-sdk-licenses: false
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
